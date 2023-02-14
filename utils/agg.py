@@ -1,3 +1,4 @@
+"""Copyright 2023 by @jet981217. All rights reserved."""
 from typing import List
 
 import torch
@@ -11,7 +12,7 @@ class agg:
         memory_len: int,
         vocab_size: int,
         token_ids_to_use: List[int]
-    ):
+    ) -> None:
         self.__device = device
         self.__token_ids_to_use = token_ids_to_use
 
@@ -24,7 +25,7 @@ class agg:
         self.__alpha = alpha
 
 
-    def dynamic_rare_token_grouping(self):
+    def dynamic_rare_token_grouping(self) -> None:
         boundary = self.__step \
             if self.__step < len(self.__memory_cell) else None
         memory_mean = torch.mean(self.__memory_cell[:boundary], 0)
@@ -65,7 +66,7 @@ class agg:
     def step_agg(
         self,
         input_tokens_batch: torch.Tensor
-    ):
+    ) -> None:
         self.__memory_cell[
             self.__step % len(self.__memory_cell)
         ] = torch.Tensor([
@@ -76,7 +77,7 @@ class agg:
         self.dynamic_rare_token_grouping()
 
 
-    def get_gate_mask(self, target_token: int):
+    def get_gate_mask(self, target_token: int) -> torch.Tensor:
         if target_token in self.__rare_tokens:
             return self.__g2_gate_vector
         return self.__g1_gate_vector

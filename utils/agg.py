@@ -4,7 +4,7 @@ from typing import List
 import torch
 
 
-class agg:
+class AGG:
     def __init__(
         self,
         device: str,

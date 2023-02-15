@@ -13,19 +13,37 @@ class AGG:
         vocab_size: int,
         token_ids_to_use: List[int]
     ) -> None:
+        """Adaptive gradient gating class
+
+        Args:
+            device (str):
+                Device to handle tensors.
+            alpha (float):
+                Hyper-parameter to decide rare tokens.
+            memory_len (int):
+                Steps to log.
+            vocab_size (int):
+                Total size of vocab for tokenizer.
+            token_ids_to_use (List[int]):
+                Token ids which contains real word.
+                [MASK], [CLS] etc will be cannot be part of this list
+        """    
         self.__device = device
         self.__token_ids_to_use = token_ids_to_use
 
         self.__memory_cell = torch.Tensor(
             [[0]*vocab_size]*memory_len
         ).to(device)
-        self.__appearance_rate = torch.ones_like(self.__memory_cell)
+        self.__appearance_rate = torch.ones_like(
+            self.__memory_cell
+        ).to(device)
 
         self.__step = 0
         self.__alpha = alpha
 
 
     def dynamic_rare_token_grouping(self) -> None:
+        """Method to dynamically group rare tokens for each step"""        
         boundary = self.__step \
             if self.__step < len(self.__memory_cell) else None
         memory_mean = torch.mean(self.__memory_cell[:boundary], 0)
@@ -43,7 +61,7 @@ class AGG:
             torch.Tensor(
                 [rare_token_info[1] for rare_token_info in rare_tokens]
             )
-        )
+        ).to(self.__device)
 
         self.__rare_tokens = [
             rare_token_info[0] for rare_token_info in rare_tokens
@@ -67,6 +85,12 @@ class AGG:
         self,
         input_tokens_batch: torch.Tensor
     ) -> None:
+        """Step agg
+
+        Args:
+            input_tokens_batch (torch.Tensor):
+                Input tokens for a batch(step).
+        """    
         self.__memory_cell[
             self.__step % len(self.__memory_cell)
         ] = torch.Tensor([
@@ -77,7 +101,16 @@ class AGG:
         self.dynamic_rare_token_grouping()
 
 
+    @property
     def get_gate_mask(self, target_token: int) -> torch.Tensor:
+        """Get gating mask for each case
+
+        Args:
+            target_token (int): _description_
+
+        Returns:
+            torch.Tensor: _description_
+        """        
         if target_token in self.__rare_tokens:
             return self.__g2_gate_vector
         return self.__g1_gate_vector

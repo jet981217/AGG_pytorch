@@ -1,2 +1,10 @@
-# Dataset
-dataset/
+# Pre-commit tools
+.pre-commit-config.yaml
+ml-python-tools
+
+*.pyc
+__pycache__/
+
+.DS_Store
+.github
+.pylintrc

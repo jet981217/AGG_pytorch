@@ -1,0 +1,42 @@
+{
+    "output_PLM_version": "v1",
+    "pretrained_weight": "",
+    "optimizer_path": "",
+    "scheduler_path": "",
+    "mask_prob": 0.3,
+    "custom_model_config_path": "",
+    "custom_tokenizer_path": "",
+    "model": "vanilla-transformer-base",
+    "dataset" : "wikitext",
+    "num_workers": 24,
+    "batch_size": {
+        "train" : 256,
+        "val" : 512,
+        "test" : 512
+    },
+    "output_root": "ckpt/pretrain",
+    "agg_params": {
+        "alpha": 0.03,
+        "memory_len": 30
+    },
+    "train_params": {
+        "max_seq_len": 128,
+        "num_train_epochs": 200,
+        "weight_decay": 0.0,
+        "gradient_accumulation_steps": 1,
+        "adam_epsilon": 1e-8,
+        "warmup_proportion": 0.001,
+        "T_0" : 50,
+        "T_mult" : 1,
+        "scheduler_gamma" : 0.8,
+        "max_grad_norm": 1.0,
+        "no_cuda": false,
+        "save_optimizer": false,
+        "seed": 42,
+        "logging_steps": 1500,
+        "save_epochs": 1500,
+        "max_learning_rate": 3e-5,
+        "patience": 3,
+        "half_probe_boundary_rate": 0.5
+    }
+}

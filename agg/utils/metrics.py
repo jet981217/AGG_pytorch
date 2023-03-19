@@ -25,21 +25,24 @@ def isotropy(
 
     if batch_process:
         Z_a = torch.sum(
-            torch.exp(unit_vectors.T.matmul(word_embedding_matrix)),
-            dim=-1
+            torch.exp(word_embedding_matrix.matmul(unit_vectors.T)),
+            dim=0
         )
-        return torch.min(Z_a, dim=-1)/torch.max(Z_a, dim=-1)
+        min_value, _ = torch.min(Z_a, dim=-1)
+        max_value, _ = torch.max(Z_a, dim=-1)
+
+        return min_value/max_value
     
-    min_val = torch.Tensor(float("inf"))
-    max_val = torch.Tensor(0.)
+    min_val = torch.Tensor([float("inf")])
+    max_val = torch.Tensor([0.])
     
     for unit_vector in unit_vectors:
         Z = torch.sum(
             torch.exp(word_embedding_matrix.matmul(unit_vector.T)),
             dim=-1
         )
-        if Z < min_val:
-            min_val = Z
-        if Z >= max_val:
-            max_val = Z
-    return min_val/max_val
+        if Z < min_val[0]:
+            min_val[0] = Z
+        if Z >= max_val[0]:
+            max_val[0] = Z
+    return min_val[0]/max_val[0]
